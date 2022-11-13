@@ -1,15 +1,29 @@
 import requests
 
 def get_Cookie() -> str:
+    if len(get_Cookie.Cookie):
+        """
+        The required cookies have already been created
+        another call to the function may return only some
+        of them and ruin the authenticity of the scraper
+        """
+        return get_Cookie.Cookie
+    
     with requests.Session() as s:
+        # generate new cookies by request from the 'refresh' url
         res = s.get('https://gw.yad2.co.il/auth/token/refresh')
         co_dict = res.cookies.get_dict()
         
-        Cookie = ''
         for key in co_dict:
-            Cookie += f'{key}={co_dict[key]}; '
+            get_Cookie.Cookie += f'{key}={co_dict[key]}; '
     
-    return Cookie
+    for c in ('__uzma', '__uzmb', '__uzmc', '__uzmd', '__uzme'):
+        # Check if all cookies are created correctly
+        if c not in get_Cookie.Cookie:
+            raise Exception('Failed to generate cookies.\nPlease restart program for new session.')
+    
+    return get_Cookie.Cookie
+get_Cookie.Cookie = ''
 
 def get_headers() -> dict:
     headers = {
